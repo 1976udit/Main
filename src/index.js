@@ -1,17 +1,25 @@
-// to instantly configure the env constants or file we use
+// to instantly configure the env constants or file, we use
 // require('dotenv').config({path : './env'})  or we can do
-import dotenv from 'dotenv';
+import dotenv from "dotenv"
 
-import express from 'express';
 import connectDB from "./db/db.js";
-const app = express()
+import app from "./app.js"
 
-connectDB();
 dotenv.config({
     path : "./env"
 })
 
+// connectDB is a asyn function hence it returns a promise
 
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT || 3000 , () => {
+        console.log("Server is now Live!")
+    })
+})
+.catch((err)=>{
+    console.log(err)
+})
 
 
 
