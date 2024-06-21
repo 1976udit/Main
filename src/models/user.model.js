@@ -18,14 +18,6 @@ const userSchema = new Schema({
         lowercase : true,
         trim : true
     },
-    email : {
-        type : String,
-        required : true,
-        unique : true,
-        lowercase : true,
-        trim : true,
-        index : true   
-    },
     fullname : {
         type : String,
         required : true,
@@ -63,6 +55,32 @@ userSchema.pre("save", async function (next){
 // Custome Methods we can write in userSchema usinf bcrypt
 userSchema.methods.isPasswordCorrect = async function(password){
    return await bcrypt.compare(password, this.password)   // it take two passwords new and saved in database (bool function)
+}
+
+userSchema.methods.generateAccessToken = function(){
+    jwt.sign(
+        {                                             // payload (data which is encoded)
+            _id : this._id,
+            email : this.email,
+            username : this.username,
+            fullname : this.fullname
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn : process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+userSchema.methods.generateRefreshToken = function(){
+    jwt.sign(
+        {                                             // payload (data which is encoded)
+            _id : this._id
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn : process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
 }
 
 
