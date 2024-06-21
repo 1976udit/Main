@@ -29,7 +29,7 @@ const registerUser = asyncHandler( async (req,res) => {
    if(
       [fullname,password,email,username].some((field)=> field?.trim() === "")
    ){
-      throw new apiError(400 , "All fielda are required!")
+      throw new apiError(400 , "All fielda are required!")  
    }
 
    if(!email.includes("@")){
@@ -37,12 +37,12 @@ const registerUser = asyncHandler( async (req,res) => {
    }
 
    // user already exist or not
-   const existance =  User.findOne({
+   const existance = await User.findOne({
       $or : [{username} , {email}]
    })
    // console.log(existance);
    
-   if(!existance) {
+   if(existance) {
        throw new apiError(409,"user with this email or username already exist!") 
    }
    
@@ -63,7 +63,7 @@ const registerUser = asyncHandler( async (req,res) => {
    }
    
    // Now if everything is fine make an object to inject into the database
-   const user = User.create({
+   const user = await User.create({
       fullname,
       avatar : avatar.url,
       coverImage : coverImage?.url || "",
@@ -79,7 +79,7 @@ const registerUser = asyncHandler( async (req,res) => {
    }
 
    return res.status(201).json(
-      new ApiResponse(200,createdUser , "User registered Successfully!")
+      new ApiResponse(200,createdUser , "User registered Successfully!")  
    )
 
 })
