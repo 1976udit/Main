@@ -1,7 +1,7 @@
 // Promise approach
 // This function is returning a new function with proper error handling by passing error to express error middleware
 const asyncHandler = (requestHandler) => {
-    (req,res,next) => {
+   return (req,res,next) => {
         Promise.resolve(requestHandler(req,res,next)).catch((err) => next(err))
     }
 }
