@@ -4,6 +4,20 @@ import { User } from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudnery.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 
+const generateTokens = async (userId) => {
+   try {
+      const user = await User.findById(userId)
+      const AccessToken = user.generateAccessToken()
+      const RefreshToken = user.generateRefreshToken()
+      
+      user.refreshToken = RefreshToken;
+      user.save({validateBeforeSave : false})
+
+   } catch (error) {
+      throw new apiError(500 , "Somthing went wrong while generating Tokens")
+   }
+}
+
 const registerUser = asyncHandler( async (req,res) => {
    
    // [ Logic Building ]
@@ -91,4 +105,47 @@ const registerUser = asyncHandler( async (req,res) => {
 
 })
 
-export {registerUser};
+const loginUser = asyncHandler(async (req,res) => {
+ 
+   // [ logic ]
+   // step-1  (get the required details from frontend) -- username/email and password
+   // step-2  (validate the inputs from the user)
+   // step-3  (check the existance or find the user through username/email)
+   // step-4  (verify the password)
+   // step-5  (generate access and refresh token)
+   // step-6  (provide these tokens to user through cookies)
+
+   const [username , password , email] = req.body;
+
+   if(!username || !email){
+      throw new apiError(400, "username or email is required!")
+   }
+
+   // finding the user 
+   const user = await User.findOne({
+      $or : [{username},{email}]
+   })
+
+   if(!user){
+      throw new apiError(404,"user does not exist!")
+   }
+
+   // verify the password
+   // if(this.password !== password){
+   //    throw new apiError(400 , "Invalid password!")
+   // }                                           // we can do this but we have a bcrypt method to check password
+
+   const isPasswordValid = await user.isPasswordCorrect(password);
+
+   if(!isPasswordValid){
+      throw new apiError(401 , "Invalid Password")
+   }
+
+
+
+})
+
+export {
+   registerUser,
+   loginUser
+};

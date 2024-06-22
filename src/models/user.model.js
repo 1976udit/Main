@@ -52,7 +52,7 @@ userSchema.pre("save", async function (next){
     next();
 })
 
-// Custome Methods we can write in userSchema usinf bcrypt
+// Custome Methods we can write in userSchema usinf bcrypt (only your user has the access to these methods)
 userSchema.methods.isPasswordCorrect = async function(password){
    return await bcrypt.compare(password, this.password)   // it take two passwords new and saved in database (bool function)
 }
