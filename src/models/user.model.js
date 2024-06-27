@@ -45,7 +45,7 @@ const userSchema = new Schema({
 },{timestamps:true})
 
 // .pre is a middleware(hook) which execute just after any mentioned event() it takes an callback but not arrow function
-// bcz arrow function dont not have the defination of this keyword which is required here
+// bcz arrow function do not have the defination of this keyword which is required here
 userSchema.pre("save", async function (next){
     if(!this.isModified("password")) return next();
     this.password =await bcrypt.hash(this.password,10)    // this take 2 args (field and hash rounds)
