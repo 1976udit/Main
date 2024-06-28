@@ -17,7 +17,7 @@ export const verifyJWT = asyncHandler(async (req,_,next) => {
             throw new apiError(401 , "Unauthorizes Request!") 
         }
         
-        // Now we decode the info reom the jwt tokens 
+        // Now we decode the info from the jwt tokens 
         const decodedToken = await jwt.verify(token , process.env.ACCESS_TOKEN_SECRET) // pass token and token_secret
     
         const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
