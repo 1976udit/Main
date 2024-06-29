@@ -1,7 +1,7 @@
 import {asyncHandler} from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
-import {deleteImageFromCloudinary, uploadOnCloudinary} from "../utils/cloudnery.js"
+import { deleteAvatarFromCloudinary, deleteCoverImageFromCloudinary, uploadOnCloudinary} from "../utils/cloudnery.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 import jwt from "jsonwebtoken"
 
@@ -296,7 +296,7 @@ const updateUserAvatar = asyncHandler(async (req,res) => {
    if(!avatar.url){
       throw new apiError(400,"Error while file uploading of Avatar!")
    }
-    deleteImageFromCloudinary();
+   deleteAvatarFromCloudinary();
    const user = await User.findByIdAndUpdate(req.user?._id,
       $set = {avatar : avatar.url},
       {new:true} ).select("-password")
@@ -311,7 +311,7 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
    if(!coverLocalPath){
        throw new apiError(400,"Cover file is missing!")
    } 
-
+   deleteCoverImageFromCloudinary()  
    const coverImage = await uploadOnCloudinary(coverLocalPath)
    if(!coverImage.url){
       throw new apiError(400,"Error while file uploading of Cover Image!")
@@ -324,7 +324,6 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
 return res.status(200)
           .json(200,user,"Cover Image is successfully changed!")
 })
-
 
 
 export {
