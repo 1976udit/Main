@@ -325,6 +325,80 @@ return res.status(200)
           .json(200,user,"Cover Image is successfully changed!")
 })
 
+const getUserChannelProfile = asyncHandler(async (req,res) => {
+   const {username} = req.params
+   if(!username?.trim()){
+      throw new apiError(400,"Username is Missing!")
+   }
+
+   // Aggregation Pipline (stages of function on entire set of objects(users)) --> return arrays
+   const channel = await User.aggregate([
+      //stage-1
+      {
+         $match : {
+            username : username?.toLowerCase()     // Now you have only one obj which is channel
+         }
+      },
+      //stage-2 (no. of a channel's subscribers)
+      {
+         $lookup :{
+            from : "subscriptions",       // see from this model
+            localField : "_id",
+            foreignField : "channel",
+            as : "subscribers"
+         }
+      },
+      //stage-3 (no. of channels subscribed)
+      {
+         $lookup : {
+            from : "subscriptions",       // see from this model
+            localField : "_id",
+            foreignField : "subscriber",
+            as : "subscribedTo"
+         }
+      },
+      //stage-4 (adding new fields)
+      {
+         $addFields : {
+            subscribersCount : {
+               $size : "$subscribers"
+            },
+            channelSubscribedTo : {
+               $size : "subscribedTo"
+            },
+            isSubscribed : {
+               $cond : {
+                  if : {$in : [req.user?._id, "$subscribers.subscriber"]},
+                  then : true,
+                  else : false
+               }
+            }
+         }
+      },
+      //stage-5 (porjecting)
+      {
+         $project : {
+            fullname : 1,         // this si a flag aggregation function
+            username : 1,
+            subscribersCount : 1,
+            channelSubscribedTo : 1,
+            isSubscribed :1,
+            avatar : 1,
+            coverImage :1,
+            email : 1
+         }
+      }
+
+   ])
+
+   if(!channel?.length){
+      throw new apiError(404 , "Channel does not exist!")
+   }
+
+   return res.status(200)
+             .json(new ApiResponse(200,channel[0],"User Channel is Fatched Successfully!"))
+})
+
 
 export {
    registerUser,
@@ -335,5 +409,6 @@ export {
    getCurrentUser,
    updateUserDetails,
    updateUserAvatar,
-   updateUserCoverImage
+   updateUserCoverImage,
+   getUserChannelProfile
 };
