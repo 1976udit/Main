@@ -19,7 +19,7 @@ const generateTokens = async (userId) => {
       return {accessToken,refreshToken}
 
    } catch (error) {
-      throw new apiError(500 , "Somthing went wrong while generating Tokens")
+      throw new apiError(500 , error)
    }
 }
 
