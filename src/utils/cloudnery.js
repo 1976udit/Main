@@ -29,7 +29,7 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-const deleteImageFromCloudinary = asyncHandler(async ()=>{
+const deleteAvatarFromCloudinary = asyncHandler(async ()=>{
     const user = await User.findById(req.user?._id)
     if(!user){
        throw new apiError(500,"Error in deleting filr from Cloudinary!")
@@ -44,4 +44,23 @@ const deleteImageFromCloudinary = asyncHandler(async ()=>{
     return res.sataus(200)
  })
 
-export {uploadOnCloudinary , deleteImageFromCloudinary};
+ const deleteCoverImageFromCloudinary = asyncHandler(async ()=>{
+    const user = await User.findById(req.user?._id)
+    if(!user){
+       throw new apiError(500,"Error in deleting filr from Cloudinary!")
+    }
+    const coverString = user.coverImage;
+    const coverArray = coverString.split('/')
+    const ImageString = coverArray[coverArray.length()-1]
+    const ImageName = ImageString.split('.')[0]
+ 
+    cloudinary.uploader.destroy(ImageName)
+
+    return res.sataus(200)
+ })
+
+export {
+       uploadOnCloudinary,
+       deleteAvatarFromCloudinary,
+       deleteCoverImageFromCloudinary
+    };
