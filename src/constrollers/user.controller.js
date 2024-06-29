@@ -297,8 +297,8 @@ const updateUserAvatar = asyncHandler(async (req,res) => {
       throw new apiError(400,"Error while file uploading of Avatar!")
    }
 
-   const user =await User.findByIdAndUpdate(req.user?._id,
-      $set = {avatar : avatar.url},
+   const user = await User.findByIdAndUpdate(req.user?._id,
+       $set = {avatar : avatar.url},
       {new:true} ).select("-password")
    
  return res.status(200)
@@ -324,6 +324,8 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
 return res.status(200)
           .json(200,user,"Cover Image is successfully changed!")
 })
+
+
 
 export {
    registerUser,

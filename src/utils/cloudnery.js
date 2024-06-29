@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from 'fs';  
+import { User } from "../models/user.model";
+import {asyncHandler} from "./asyncHandler.js"
 
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -27,4 +29,19 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary};
+const deleteImageFromCloudinary = asyncHandler(async (userId)=>{
+    const user = await User.findById(userId)
+    if(!user){
+       throw new apiError(500,"Error in deleting filr from Cloudinary!")
+    }
+    const avatarString = user.avatar;
+    const avatarArray = avatarString.split('/')
+    const ImageString = avatarArray[avatarArray.length()-1]
+    const ImageName = ImageString.split('.')[0]
+ 
+    cloudinary.uploader.destroy(ImageName)
+
+    return res.sataus(200)
+ })
+
+export {uploadOnCloudinary , deleteImageFromCloudinary};
