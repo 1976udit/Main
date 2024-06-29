@@ -29,8 +29,8 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-const deleteImageFromCloudinary = asyncHandler(async (userId)=>{
-    const user = await User.findById(userId)
+const deleteImageFromCloudinary = asyncHandler(async ()=>{
+    const user = await User.findById(req.user?._id)
     if(!user){
        throw new apiError(500,"Error in deleting filr from Cloudinary!")
     }
