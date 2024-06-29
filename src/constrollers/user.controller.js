@@ -7,12 +7,17 @@ import {ApiResponse} from "../utils/apiResponse.js"
 const generateTokens = async (userId) => {
    try {
       const user = await User.findById(userId)
-      const AccessToken = user.generateAccessToken()
-      const RefreshToken = user.generateRefreshToken()
       
-      user.refreshToken = RefreshToken;
+      const accessToken = user.generateAccessToken()
+      
+      const refreshToken = user.generateRefreshToken()
+   
+      
+      user.refreshToken = refreshToken;
       await user.save({validateBeforeSave : false})   // to save data in the database
-      return {AccessToken,RefreshToken}
+
+      return {accessToken,refreshToken}
+
    } catch (error) {
       throw new apiError(500 , "Somthing went wrong while generating Tokens")
    }
@@ -115,9 +120,9 @@ const loginUser = asyncHandler(async (req,res) => {
    // step-5  (generate access and refresh token)
    // step-6  (provide these tokens to user through cookies)
 
-   const [username , password , email] = req.body;
+   const {username , password , email} = req.body;
 
-   if(!username || !email){
+   if(!username && !email){
       throw new apiError(400, "username or email is required!")
    }
 
